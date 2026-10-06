@@ -9,35 +9,22 @@ type InstagramMedia = {
 };
 
 const knownPosts = [
-  { id: "DdXhBINJEsx", link: "https://www.instagram.com/p/DdXhBINJEsx/" },
-  { id: "DdWurjeOpMe", link: "https://www.instagram.com/p/DdWurjeOpMe/" },
-  { id: "DdWpgy_RIaa", link: "https://www.instagram.com/p/DdWpgy_RIaa/" },
+  {
+    id: "DdXhBINJEsx",
+    link: "https://www.instagram.com/p/DdXhBINJEsx/",
+    image: "/instagram-posts/DdXhBINJEsx.jpg",
+  },
+  {
+    id: "DdWurjeOpMe",
+    link: "https://www.instagram.com/p/DdWurjeOpMe/",
+    image: "/instagram-posts/DdWurjeOpMe.jpg",
+  },
+  {
+    id: "DdWpgy_RIaa",
+    link: "https://www.instagram.com/p/DdWpgy_RIaa/",
+    image: "/instagram-posts/DdWpgy_RIaa.jpg",
+  },
 ];
-
-async function publicPostFallback() {
-  return Promise.all(knownPosts.map(async (post) => {
-    try {
-      const response = await fetch(`https://www.instagram.com/p/${post.id}/embed/captioned/`, {
-        signal: AbortSignal.timeout(6000),
-        headers: { "User-Agent": "Mozilla/5.0" },
-        next: { revalidate: 900 },
-      });
-      if (!response.ok) return { ...post, image: "", caption: "" };
-
-      const html = await response.text();
-      const match = html.match(/"(https?:[^\"]*t51\.82787-15[^\"]*)"/);
-      const image = match?.[1]
-        .replaceAll("\\/", "/")
-        .replaceAll("\\u0026", "&")
-        .replaceAll("&amp;", "&");
-
-      return { ...post, image: image ? `/api/instagram/image/${post.id}` : "", caption: "" };
-    } catch (error) {
-      console.warn(`[instagram] Could not load public preview for ${post.id}`, error);
-      return { ...post, image: "", caption: "" };
-    }
-  }));
-}
 
 const unavailable = (reason: string, status = 503) => {
   console.error(`[instagram] ${reason}`);
@@ -51,7 +38,11 @@ export async function GET() {
   if (!userId || !accessToken) {
     console.warn("[instagram] Credentials are not configured; returning supplied public post links.");
     return Response.json(
-      { ok: true, posts: await publicPostFallback(), source: "provided-links" },
+      {
+        ok: true,
+        posts: knownPosts.map((post) => ({ ...post, caption: "" })),
+        source: "provided-links",
+      },
       { headers: { "Cache-Control": "public, s-maxage=900, stale-while-revalidate=3600" } },
     );
   }
@@ -84,14 +75,14 @@ export async function GET() {
     const data = (await response.json()) as { data?: InstagramMedia[] };
     const posts = (Array.isArray(data.data) ? data.data : [])
       .filter((media) =>
-        (media.media_type === "IMAGE" || media.media_type === "CAROUSEL_ALBUM") &&
-        Boolean(media.id && media.media_url && media.permalink),
+        ["IMAGE", "CAROUSEL_ALBUM", "VIDEO"].includes(media.media_type ?? "") &&
+        Boolean(media.id && (media.media_url || media.thumbnail_url) && media.permalink),
       )
       .sort((a, b) => Date.parse(b.timestamp ?? "") - Date.parse(a.timestamp ?? ""))
       .slice(0, 3)
       .map((media) => ({
         id: media.id,
-        image: media.media_url,
+        image: media.thumbnail_url || media.media_url,
         link: media.permalink,
         caption: media.caption ?? "",
       }));
