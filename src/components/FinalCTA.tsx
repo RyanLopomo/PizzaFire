@@ -26,7 +26,8 @@ export function FinalCTA() {
         <a
           href={siteConfig.whatsapp}
           target="_blank"
-          className="inline-block mt-8 bg-orange-500 px-8 py-5 rounded-xl text-sm uppercase font-bold tracking-wider shadow-[0_0_40px_rgba(249,115,22,0.5)] hover:scale-105 transition"
+          data-contact-cta
+          className="contact-fire-button inline-block mt-8 bg-orange-500 px-8 py-5 rounded-xl text-sm uppercase font-bold tracking-wider shadow-[0_0_40px_rgba(249,115,22,0.5)] hover:scale-105 transition"
         >
           Pedir agora
         </a>

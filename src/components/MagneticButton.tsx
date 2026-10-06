@@ -30,7 +30,8 @@ export function MagneticButton({
         stiffness: 320,
         damping: 18,
       }}
-      className={className}
+      data-contact-cta
+      className={`contact-fire-button ${className ?? ""}`}
     >
       {children}
     </motion.a>

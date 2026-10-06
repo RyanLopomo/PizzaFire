@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function CustomCursor() {
   const mouseX = useMotionValue(-100);
@@ -10,10 +10,20 @@ export function CustomCursor() {
   const springX = useSpring(mouseX, { stiffness: 500, damping: 40 });
   const springY = useSpring(mouseY, { stiffness: 500, damping: 40 });
 
+  const [isFire, setIsFire] = useState(false);
+
   useEffect(() => {
     const move = (e: MouseEvent) => {
-      mouseX.set(e.clientX - 10);
-      mouseY.set(e.clientY - 10);
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+
+      // determine if hovering an interactive element
+      const target = e.target as Element | null;
+      if (target) {
+        setIsFire(Boolean(target.closest("[data-contact-cta]")));
+      } else {
+        setIsFire(false);
+      }
     };
 
     window.addEventListener("mousemove", move);
@@ -29,7 +39,10 @@ export function CustomCursor() {
         x: springX,
         y: springY,
       }}
-      className="pointer-events-none fixed left-0 top-0 z-[1000] hidden h-5 w-5 rounded-full border border-orange-400/80 mix-blend-difference lg:block"
-    />
+      aria-hidden="true"
+      className="pointer-events-none fixed left-0 top-0 z-[1000] hidden lg:block"
+    >
+      <span className={isFire ? "cursor-fire" : "cursor-ring"} />
+    </motion.div>
   );
 }

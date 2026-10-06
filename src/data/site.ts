@@ -39,10 +39,3 @@ export const pizzas = [
   },
 ];
 
-export const gallery = [
-  "/galeria-1.jpg",
-  "/galeria-2.jpg",
-  "/galeria-3.jpg",
-  "/galeria-4.jpg",
-  "/galeria-5.jpg",
-];

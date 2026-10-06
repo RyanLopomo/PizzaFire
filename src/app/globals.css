@@ -177,9 +177,141 @@ img {
 }
 
 @media (min-width: 1024px) {
-  a,
-  button {
+  /* Hide the native cursor on large screens so only the custom cursor is visible */
+  body {
     cursor: none;
+  }
+
+  /* Also ensure interactive elements don't force the native pointer to appear */
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"] {
+    cursor: none !important;
+  }
+}
+
+.cursor-ring {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(251, 146, 60, 0.9);
+  border-radius: 999px;
+  mix-blend-mode: difference;
+}
+
+.cursor-fire {
+  position: absolute;
+  top: -31px;
+  left: -15px;
+  width: 30px;
+  height: 34px;
+  border: 0;
+  border-radius: 52% 48% 55% 45%;
+  background: radial-gradient(ellipse at 50% 72%, #fff7bd 0 12%, #ffd166 22%, #fb711c 48%, #d92312 70%, transparent 73%);
+  filter: drop-shadow(0 0 8px rgba(255, 115, 24, 0.9));
+  mix-blend-mode: screen;
+  animation: cursorFlame 420ms ease-in-out infinite alternate;
+}
+
+.cursor-fire::before,
+.cursor-fire::after {
+  position: absolute;
+  bottom: 1px;
+  width: 11px;
+  height: 20px;
+  border-radius: 80% 15% 65% 35%;
+  background: linear-gradient(0deg, #f04412, #ffb12e 65%, rgba(255, 226, 130, 0.15));
+  content: "";
+  filter: blur(1px);
+  transform-origin: bottom center;
+  animation: flameTongue 360ms ease-in-out infinite alternate;
+}
+
+.cursor-fire::before {
+  left: 3px;
+}
+
+.cursor-fire::after {
+  right: 3px;
+  animation-delay: -190ms;
+}
+
+.contact-fire-button {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  transition: box-shadow 260ms ease, filter 260ms ease;
+}
+
+.contact-fire-button::before,
+.contact-fire-button::after {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.contact-fire-button::before {
+  inset: -5px -3px;
+  border-radius: inherit;
+  background: linear-gradient(105deg, #ffb22e 0%, #ff5a17 28%, #ef2f12 52%, #ff8a1e 78%, #ffd067 100%);
+  filter: blur(10px);
+  transform: scaleY(0.82);
+}
+
+.contact-fire-button::after {
+  inset: -3px -2px;
+  border-radius: inherit;
+  background: linear-gradient(0deg, rgba(254, 76, 17, 0.92), rgba(255, 180, 43, 0.82) 44%, transparent 77%);
+  filter: blur(5px);
+  transform: scaleY(0.9);
+}
+
+.contact-fire-button:hover::before,
+.contact-fire-button:hover::after,
+.contact-fire-button:focus-visible::before,
+.contact-fire-button:focus-visible::after {
+  opacity: 0.9;
+  animation: buttonFlame 700ms ease-in-out infinite alternate;
+}
+
+.contact-fire-button:hover,
+.contact-fire-button:focus-visible {
+  filter: saturate(1.2) brightness(1.08);
+  box-shadow: 0 0 24px rgba(255, 82, 18, 0.55), 0 0 52px rgba(249, 115, 22, 0.32);
+}
+
+@keyframes cursorFlame {
+  from { transform: scale(0.9) rotate(-5deg); }
+  to { transform: scale(1.08) rotate(5deg) translateY(-2px); }
+}
+
+@keyframes flameTongue {
+  from { transform: scaleY(0.68) rotate(-12deg); opacity: 0.78; }
+  to { transform: scaleY(1.12) rotate(12deg) translateY(-2px); opacity: 1; }
+}
+
+@keyframes buttonFlame {
+  from { transform: scaleY(0.86) translateY(1px); filter: blur(9px) saturate(0.95); }
+  to { transform: scaleY(1.06) translateY(-2px); filter: blur(13px) saturate(1.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-fire,
+  .cursor-fire::before,
+  .cursor-fire::after,
+  .contact-fire-button:hover::before,
+  .contact-fire-button:hover::after,
+  .contact-fire-button:focus-visible::before,
+  .contact-fire-button:focus-visible::after {
+    animation: none;
   }
 }
 
